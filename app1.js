@@ -1,24 +1,71 @@
-function handleclick() {
-    let get_value = document.getElementById("search").value;
-    document.getElementById("list").innerHTML += `
-<div class="list_container">
-            <li>${get_value}</li>
-<button data-bs-toggle="modal" data-bs-target="#exampleModal" onclick=modal()>Edit</button>
-<button>Delete</button>
-        </div>
-`
+document.addEventListener("DOMContentLoaded", function () {
+  // Load tasks from local storage on page load
+  loadTasks();
+});
+
+function addTask() {
+  const taskInput = document.getElementById("taskInput");
+  const taskList = document.getElementById("taskList");
+
+  if (taskInput.value.trim() !== "") {
+      // Create a new task item
+      const taskItem = document.createElement("li");
+      taskItem.innerText = taskInput.value;
+
+      // Add delete button
+      const deleteButton = document.createElement("button");
+      deleteButton.innerText = "Delete";
+      deleteButton.onclick = function () {
+          taskItem.remove();
+          saveTasks();
+      };
+
+      taskItem.appendChild(deleteButton);
+      taskList.appendChild(taskItem);
+
+      // Clear input field
+      taskInput.value = "";
+
+      // Save tasks to local storage
+      saveTasks();
+  }
 }
-function modal() {
-    document.querySelector(".modal-dialog").innerHTML= `
-   <div class="modal-content">
-   <div class="modal-body">
-     <input type="search">
-       <button>Update</button>
-   </div>
-   <div class="modal-footer">
-                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                 <button type="button" class="btn btn-primary">Save changes</button>
-   </div>
- </div>
-   `
+
+function saveTasks() {
+  const taskList = document.getElementById("taskList");
+  const tasks = [];
+
+  // Iterate through each task and save it to the array
+  taskList.childNodes.forEach(function (taskItem) {
+      tasks.push(taskItem.innerText);
+  });
+
+  // Save tasks array to local storage
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function loadTasks() {
+  const taskList = document.getElementById("taskList");
+  const savedTasks = localStorage.getItem("tasks");
+
+  if (savedTasks) {
+      const tasks = JSON.parse(savedTasks);
+
+      // Create task items from saved tasks
+      tasks.forEach(function (taskText) {
+          const taskItem = document.createElement("li");
+          taskItem.innerText = taskText;
+
+          // Add delete button
+          const deleteButton = document.createElement("button");
+          deleteButton.innerText = "Delete";
+          deleteButton.onclick = function () {
+              taskItem.remove();
+              saveTasks();
+          };
+
+          taskItem.appendChild(deleteButton);
+          taskList.appendChild(taskItem);
+      });
+  }
 }
